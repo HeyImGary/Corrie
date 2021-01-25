@@ -2,11 +2,16 @@
   text-align: center;
 }
 
-.Contact-Card {
+.Card {
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
   display: block;
   width: 20rem;
   justify-content: center;
-  padding: 1rem 1rem;
+  padding: 1rem 1.5rem;
   margin: 1rem auto;
+}
+
+label,
+input {
+  width: 100%;
 }

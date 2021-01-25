@@ -1,61 +1,80 @@
 import './App.css';
 import ContactCard from './Conponents/Contact-Card';
+import NewContactForm from './Conponents/New-Contact-Form';
 
-import { useState, useEffect } from 'react';
-
-let Contact = [
-  {
-    first_name: 'David',
-    last_name: 'Platt',
-    phone: '01913478234',
-    email: 'david.platt@corrie.co.uk',
-  },
-  {
-    first_name: 'Jason',
-    last_name: 'Grimshaw',
-    phone: '01913478123',
-    email: 'jason.grimshaw@corrie.co.uk',
-  },
-  {
-    first_name: 'Ken',
-    last_name: 'Barlow',
-    phone: '019134784929',
-    email: 'ken.barlow@corrie.co.uk',
-  },
-  {
-    first_name: 'Rita',
-    last_name: 'Sullivan',
-    phone: '01913478555',
-    email: 'rita.sullivan@corrie.co.uk',
-  },
-  {
-    first_name: 'Steve',
-    last_name: 'McDonald',
-    phone: '01913478555',
-    email: 'steve.mcdonald@corrie.co.uk',
-  },
-];
+import { useEffect, useState, useForceUpdate, useMemo } from 'react';
 
 function App() {
-  const [ContactInfo, setContactInfo] = useState(Contact);
+  const initialState = {
+    first_name: '',
+    last_name: '',
+    phone: '',
+    email: '',
+  };
+
+  const [ContactInfo, setContactInfo] = useState([]);
+  const [show, toggleShow] = useState(false);
+  const [searchedContact, setSearchedContact] = useState([]);
+
+  useEffect(() => {
+    async function fetchContacts() {
+      const response = await fetch('http://localhost:3001/');
+      const json = await response.json();
+      setContactInfo(json);
+      setSearchedContact(json);
+    }
+    fetchContacts();
+  }, []);
 
   const deleteUser = (index) => {
-    console.log(index);
-    let tempUsers = [...ContactInfo];
-    tempUsers.splice(index, 1);
-    setContactInfo([...tempUsers]);
+    setContactInfo(ContactInfo.filter((_, i) => i !== index));
+  };
+
+  const addContact = (values) => {
+    setContactInfo([...ContactInfo, values]);
+  };
+
+  const updateContact = (values, index) => {
+    setContactInfo(
+      ContactInfo.map((item, i) => (i === index ? { ...values } : item))
+    );
+  };
+
+  const filterUsers = (e) => {
+    setSearchedContact(
+      ContactInfo.filter((x) =>
+        x.first_name.toLowerCase().includes(e.target.value.toLowerCase())
+      )
+    );
   };
 
   return (
     <div className='App'>
-      <h1>Phone Book</h1>
-      <button>Add New Contact</button>
+      <h1>Phone Book </h1>
+      <div className={'Card'}>
+        <input
+          placeholder='Search Phone Book. e.g. David'
+          onChange={(e) => filterUsers(e)}
+        />
+      </div>
+      <br />
+      {show ? (
+        <NewContactForm
+          InitialValues={initialState}
+          newContact={true}
+          updateContact={addContact}
+          toggleShow={toggleShow}
+        />
+      ) : (
+        <button onClick={() => toggleShow(!show)}>Add New Contact</button>
+      )}
       <div className={'Phone-Book'}>
-        {ContactInfo.map((ContactDetails, index) => (
+        {searchedContact.map((ContactDetails, index) => (
           <ContactCard
             index={index}
             data={ContactDetails}
             deleteUser={deleteUser}
+            updateContact={updateContact}
           />
         ))}
       </div>
