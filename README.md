@@ -1,3 +1,7 @@
-### `npm start`
+### `Run App`
 
-Runs the app in the development mode.\
+Cd to /server
+run 'nodemon server.js' to start the server
+
+cd to /
+run 'npm start' to start the app
